@@ -26,9 +26,19 @@
 
 - (void)displayLayer:(CALayer *)layer
 {
-  // RCTView uses displayLayer to do border rendering.
-  // We don't need to do that in RNCMaskedView, so we
-  // stub this method and override the default implementation.
+    [super displayLayer:layer];
+    CAShapeLayer *shapeLayer = [CAShapeLayer layer];
+    
+    CGRect maskFrame = self.maskView.frame;
+    if ([self.maskView subviews].count > 0) {
+            maskFrame = [[self.maskView subviews] firstObject].frame;
+      }
+    UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectMake(maskFrame.origin.x, maskFrame.origin.y, maskFrame.size.width,  maskFrame.size.height)];
+    [path appendPath:[UIBezierPath bezierPathWithRect:self.bounds]];
+
+    shapeLayer.path = path.CGPath;
+    shapeLayer.fillRule = kCAFillRuleEvenOdd;
+    layer.mask = shapeLayer;
 }
 
 @end
